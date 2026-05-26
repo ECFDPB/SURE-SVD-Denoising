@@ -120,9 +120,9 @@ SURE outperforms energy matching by +0.08 dB on average, with the advantage incr
 ## Citation
 
 ```bibtex
-@article{yang2025sure,
+@article{yang2026sure,
   title={Smooth Hard-Thresholding for Singular Values with Stein's Unbiased Risk Estimate},
   author={Yang, Guanzhong},
-  year={2025}
+  year={2026}
 }
 ```
