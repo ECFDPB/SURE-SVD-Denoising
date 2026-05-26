@@ -6,6 +6,7 @@
 \usepackage{graphicx,latexsym}
 \usepackage{algorithm,algorithmic}
 \usepackage{booktabs}
+\usepackage{url}
 \raggedbottom
 
 \numberwithin{equation}{section}
@@ -406,9 +407,9 @@ patches. Third, three query patches are sampled uniformly at random from each im
 
 The patch-group illustration documents the data construction, but it is not one of the three validation plots. It is included here as an unnumbered setup display so that the numbering of the three main empirical figures remains unchanged.
 \begin{center}
-\makebox[\textwidth][c]{\includegraphics[width=1.28\textwidth]{figures/patch_group_example_cropped.png}}
+\makebox[\textwidth][c]{\includegraphics[width=1.28\textwidth]{figures/fig_diagnostic_patch_group_schematic.png}}
 \par\smallskip
-{\scriptsize Patch construction schematic: a query patch is extracted from a normalized grayscale image, compared with patches from the same image by normalized cross-correlation, and associated with its nearest patch neighbours. The matrix-level experiments below use the query patch itself as the clean matrix $X$.}
+{\scriptsize Patch construction schematic: a query patch is extracted from a normalized grayscale image, compared with patches from the same image by normalized cross-correlation, and associated with its nearest patch neighbours. The matrix-level experiments below use the query patch itself as the clean matrix $X$.\par}
 \end{center}
 
 In these matrix-level experiments, a clean query matrix $X\in\R^{32\times32}$ is treated as fixed and independent Gaussian noise is added according to
@@ -422,7 +423,7 @@ Losses are measured by the Frobenius error
 \begin{equation}
     L(\widehat X;X,Y_r)=\norm{\widehat X(Y_r)-X}_F^2.
 \end{equation}
-When an oracle rank is reported, it is computed using the clean matrix $X$ and is therefore not available to a practical denoising method. Its only purpose is to provide a lower benchmark within the same finite candidate family. The implementation-level values of $N$, the random seeds, the tested $\tau$ values, the deterministic $\lambda$ and $\omega$ grids, the candidate rank set $\mathcal H$, the tie-breaking rule, and the near-tie tolerance for denominators $\sigma_i^2-\sigma_j^2$ are not theoretical parameters; they must be reported with the replication code to make Figures \ref{fig:exp1-sure-unbiasedness}--\ref{fig:exp3-oracle-comparison} exactly reproducible.
+When an oracle rank is reported, it is computed using the clean matrix $X$ and is therefore not available to a practical denoising method. Its only purpose is to provide a lower benchmark within the same finite candidate family. The implementation-level values of $N$, the random seeds, the tested $\tau$ values, the deterministic $\lambda$ and $\omega$ grids, the candidate rank set $\mathcal H$, the tie-breaking rule, and the near-tie tolerance for denominators $\sigma_i^2-\sigma_j^2$ are not theoretical parameters; they must be reported with the replication code to make Figures \ref{fig:exp1-sure-unbiasedness}--\ref{fig:exp3-oracle-comparison} exactly reproducible. The implementation of the proposed method and all experimental scripts are available at \url{https://github.com/ECFDPB/SURE-SVD-Denoising}.
 
 \subsection{Monte Carlo check of fixed-threshold unbiasedness}
 
