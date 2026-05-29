@@ -116,7 +116,7 @@ This rule, however, contains a jump discontinuity at $x=\lambda$. Hansen emphasi
 There is a related but distinct fixed-rank viewpoint. For a deterministic rank $h$, the reduced-rank estimator that keeps exactly the largest $h$ singular components has its own degrees-of-freedom and SURE theory; such formulae were studied by Mukherjee, Chen, Wang and Zhu in multivariate regression, and Hansen clarified that the fixed-rank reduced-rank estimator satisfies the relevant Stein conditions \cite{mukherjee2015degrees,hansen2017comment}. Consequently, for the finite-candidate comparison just described, one could obtain a deterministic-rank ranking score through fixed-rank SURE. The present paper nevertheless follows the smooth-threshold route because it addresses a different question. Fixed-rank SURE begins by taking the retained rank as the parameter; the truncation problem above begins from a threshold rule and asks how a hard-threshold-looking score can arise from legitimate fixed-threshold SURE formulae despite the discontinuity of singular value hard thresholding. This observation does not remove the tuning problem, because the rank or threshold must still be chosen. We therefore construct fixed-threshold smooth SURE formulae and then use realized finite candidate values only as plug-in scores for ranking possible retained ranks, with the data-dependence caveats made explicit below.
 
 \paragraph{Contribution and organization.}
-The goal of this paper is therefore not to deny the biasedness of hard-threshold SURE. Instead, we introduce a smooth hard-threshold approximation, prove that it satisfies the hypotheses under which SURE is exactly unbiased for every fixed threshold, and then use a limiting finite-candidate argument to obtain a simple and computationally efficient threshold-selection rule. The resulting procedure is a SURE-based tuning strategy, not a claim that the minimized SURE value is an unbiased risk estimate after threshold selection. Section 2 defines the smooth spectral estimator and proves the regularity needed for Stein's identity. Section 3 derives the finite-candidate limiting rule. Section 4 clarifies the precise interpretation of the limiting score and the post-selection caveat. Section 5 reports numerical checks of the fixed-threshold identity and post-selection caveat, evaluates the oracle-style performance of the ranking rule, describes the complete SVD denoising pipelines, and compares the resulting method with classical image-denoising baselines. Section 6 concludes.
+The goal of this paper is therefore not to deny the biasedness of hard-threshold SURE. Instead, we introduce a smooth hard-threshold approximation, prove that it satisfies the hypotheses under which SURE is exactly unbiased for every fixed threshold, and then use a limiting finite-candidate argument to obtain a simple and computationally efficient threshold-selection rule. The resulting procedure is a SURE-based tuning strategy, not a claim that the minimized SURE value is an unbiased risk estimate after threshold selection. Section 2 defines the smooth spectral estimator and proves the regularity needed for Stein's identity. Section 3 derives the finite-candidate limiting rule. Section 4 clarifies the precise interpretation of the limiting score and the post-selection caveat. Section 5 reports numerical checks of the fixed-threshold identity and post-selection caveat, evaluates the oracle-style performance of the ranking rule, describes the complete SVD denoising pipelines, and gives an illustrative fixed-realization comparison with classical image-denoising baselines. Section 6 concludes.
 
 \section{Smooth Hard-Threshold Spectral Estimator}
 
@@ -207,7 +207,18 @@ satisfies
 \end{proposition}
 
 \begin{proof}
-\emph{Application of Stein's identity.} Cand\`es, Sing-Long and Trzasko show that Lipschitz spectral estimators with suitable integrability are weakly differentiable and satisfy Stein's identity \cite{candes2013unbiased}. Hansen also stresses that global Lipschitz continuity is a sufficient condition for Stein's lemma in the matrix setting, after identifying $\R^{m\times n}$ with $\R^{mn}$ \cite{hansen2017comment}. Lemma \ref{lem:spectral-lip} gives precisely this Lipschitz condition and the origin condition. Therefore the classical Gaussian SURE identity applies to \eqref{eq:sure-general}.
+\emph{Application of Stein's identity.} Cand\`es, Sing-Long and Trzasko show that Lipschitz spectral estimators with the required integrability are weakly differentiable and satisfy Stein's identity \cite{candes2013unbiased}. Hansen also stresses that global Lipschitz continuity is a sufficient condition for Stein's lemma in the matrix setting, after identifying $\R^{m\times n}$ with $\R^{mn}$ \cite{hansen2017comment}. Lemma \ref{lem:spectral-lip} gives this Lipschitz condition and the origin condition. To make the integrability explicit, let $L_{\omega,\lambda}<\infty$ be a Lipschitz constant for $Y\mapsto\widehat X_{\omega,\lambda}(Y)$. Since $\widehat X_{\omega,\lambda}(0)=0$,
+\begin{equation}
+    \norm{\widehat X_{\omega,\lambda}(Y)}_F
+    \leq L_{\omega,\lambda}\norm{Y}_F,
+\end{equation}
+and therefore $\E\norm{\widehat X_{\omega,\lambda}(Y)-Y}_F^2<\infty$ under Gaussian noise. By Rademacher's theorem the Lipschitz map is differentiable almost everywhere and weakly differentiable; its weak Jacobian is essentially bounded by $L_{\omega,\lambda}$, so
+\begin{equation}
+    |\divop(\widehat X_{\omega,\lambda})(Y)|
+    \leq mn L_{\omega,\lambda}
+    \quad\text{for almost every }Y.
+\end{equation}
+Thus $\E|\divop(\widehat X_{\omega,\lambda})(Y)|<\infty$. The hypotheses of the Gaussian Stein identity are therefore satisfied, and \eqref{eq:sure-general} is an unbiased estimate of the fixed-threshold risk.
 \end{proof}
 
 \paragraph{Closed-form divergence.}
@@ -303,7 +314,12 @@ Consequently, because the extended candidate set including $h=0$ is finite, if $
 \end{proof}
 
 \begin{remark}[Ties]
-If several $S_h(Y)$ attain the same minimum, the limiting ordering alone does not select a unique candidate. For computational parsimony one may choose the largest threshold among the minimizers, equivalently the smallest retained rank. This tie-breaking rule affects only exactly tied limiting scores. In numerical implementation, the denominators $\sigma_i^2-\sigma_j^2$ in \eqref{eq:limiting-score} should also be protected by a small tolerance when singular values are nearly tied; exact ties have probability zero under the continuous Gaussian model but can occur up to floating-point precision in patch groups.
+If several $S_h(Y)$ attain the same minimum, the limiting ordering alone does not select a unique candidate. For computational parsimony one may choose the largest threshold among the minimizers, equivalently the smallest retained rank. This tie-breaking rule affects only exactly tied limiting scores. In numerical implementation, the denominators $\sigma_i^2-\sigma_j^2$ in \eqref{eq:limiting-score} should also be protected when singular values are nearly tied. A concrete rule is to set a tolerance
+\begin{equation}
+    \varepsilon_{\mathrm{sv}}
+    =c_{\mathrm{sv}}\,\epsilon_{\mathrm{mach}}\max\{\sigma_1^2,1\},
+\end{equation}
+with $c_{\mathrm{sv}}$ a modest safety constant, and to regard a pair as numerically tied whenever $|\sigma_i^2-\sigma_j^2|\leq\varepsilon_{\mathrm{sv}}$. When such a near tie is detected, the affected limiting-score comparisons should be treated as numerically unreliable rather than as reliable evidence for a particular global minimizer. In implementation one should either avoid splitting nearly tied singular values or fall back to a conservative rule, such as choosing the smallest retained rank among candidates whose scores remain distinguishable without near-tie denominators. Exact ties have probability zero under the continuous Gaussian model but can occur up to floating-point precision in patch groups.
 \end{remark}
 
 \subsection{Recursive ranking}
@@ -327,10 +343,10 @@ Thus all candidate scores may be ranked by computing the initial value $S_0(Y)$ 
 \end{equation}
 After the ranking step, one can then report the corresponding hard-truncated approximation $\widehat X_{\widehat\lambda}$, with the convention that $\widehat h=0$ returns the zero matrix, when a computationally sharper low-rank output is desired. The fixed-threshold SURE identity remains rigorous for deterministic $\lambda$; after the data-adaptive choice $\widehat\lambda=\widehat\lambda(Y)$ has been made, the selected SURE value should be regarded as a tuning criterion rather than as an unbiased estimate of the selected estimator's risk.
 
-\section{Interpretation and Post-Selection Caveat}
+\section{Interpretation of the Limiting Score}
 
 \paragraph{Role of the limiting score.}
-The score \eqref{eq:limiting-score} has the same algebraic form as the expression obtained by formally substituting hard thresholding into the spectral divergence formula. Hansen showed that such a hard-threshold expression is not, in general, an unbiased risk estimate for singular value hard thresholding \cite{hansen2017comment}. This paper does not use \eqref{eq:limiting-score} as an unbiased estimator of the hard-threshold risk.
+The score \eqref{eq:limiting-score} has the same algebraic form as the expression obtained by formally substituting hard thresholding into the spectral divergence formula. Hansen showed that such a hard-threshold expression is not, in general, an unbiased risk estimate for singular value hard thresholding \cite{hansen2017comment}. The present use of \eqref{eq:limiting-score} is therefore deliberately narrower: it is a finite-candidate ranking score obtained as the large-$\omega$ limit of valid fixed-threshold smooth SURE formulae, not a new unbiased risk identity for hard thresholding.
 
 \paragraph{Relation to fixed-rank SURE.}
 The same limiting score is also closely related to the fixed-rank reduced-rank estimator. For deterministic $h$, retaining the first $h$ singular components gives the fixed-rank estimator
@@ -347,72 +363,30 @@ which is distinct from fixed-threshold hard thresholding as a statistical parame
         \frac{\sigma_i^2}{\sigma_i^2-\sigma_j^2}\right\}.
 \end{aligned}
 \end{equation}
-This fixed-rank interpretation is valid for deterministic $h$. In the proposed ranking rule, however, $h$ is chosen from the same data and the midpoint thresholds are data-dependent; hence the resulting selected score remains a tuning criterion rather than an unbiased selected-risk estimate.
+This identifies an algebraic connection with fixed-rank SURE, while the threshold-based derivation above gives the interpretation used in this paper.
 
 \paragraph{Why use the smooth-threshold route?}
-The motivation for the smooth-threshold route is not merely to reproduce a fixed-rank score. Classical SVD denoising and Eckart--Young low-rank approximation are truncation-based: important singular components are kept with their observed magnitudes, while smaller components are removed. Soft thresholding has a clean SURE theory, but it also shrinks the retained singular values and therefore targets a different bias--variance tradeoff. Hard thresholding is consequently a natural spectral family if one wants to stay close to rank-truncated SVD denoising while choosing the cutoff by a risk principle.
-
-The difficulty is that fixed-threshold hard thresholding is discontinuous, so the formal hard-threshold SURE expression is not an unbiased risk estimate. The fixed-rank route bypasses this discontinuity by fixing $h$ in advance, and algebraically gives the same deterministic-$h$ score. However, it does not explain why the hard-threshold-looking score can be obtained from a legitimate fixed-threshold SURE construction. The smooth-threshold route addresses this gap: it keeps the truncation intuition, restores Stein regularity for every deterministic $\lambda$, obtains an unbiased fixed-threshold SURE formula, and only then takes a finite-candidate limit to recover the ranking score. Thus smoothing is not needed merely for algebra; it is the device that connects practical hard-threshold-type denoising with a defensible fixed-threshold SURE argument.
+The smooth-threshold construction is not intended to be a stronger alternative to the fixed-rank degrees-of-freedom theory. Rather, it answers a more specific question. Classical SVD denoising is naturally phrased as a cutoff rule: keep large observed singular values and remove small ones. Soft thresholding has a clean SURE theory, but it changes this truncation principle by shrinking every retained singular value. Hard thresholding preserves the truncation principle, but its discontinuity prevents the formal hard-threshold SURE expression from being unbiased. The smooth route gives a controlled way to stay within a threshold-parametrized family: for every deterministic $\lambda$ and finite $\omega$ the estimator satisfies the Stein regularity assumptions, and the limiting finite-candidate argument then recovers the simple ranking score. Thus the mathematical contribution is modest but precise: it justifies a hard-threshold-looking ranking rule through smooth fixed-threshold SURE, rather than claiming a new unbiased SURE formula for discontinuous or data-selected hard thresholding.
 
 \paragraph{SURE tuning and post-selection risk.}
-The logical role of \eqref{eq:limiting-score} is narrower and more defensible:
+The construction separates three statements:
 \begin{enumerate}[label=(\roman*)]
-    \item for every finite $\omega$ and every fixed deterministic threshold $\lambda$, the smooth estimator satisfies Stein's hypotheses and the fixed-threshold formula \eqref{eq:smooth-sure} is unbiased;
-    \item for the realized finite candidate values in \eqref{eq:candidate-set}, the plug-in fixed-threshold smooth SURE formula values converge pointwise to the limiting scores $S_h(Y)$;
-    \item strict inequalities among finitely many limiting scores are eventually preserved for sufficiently large $\omega$.
+    \item for fixed deterministic $\lambda$, \eqref{eq:smooth-sure} is unbiased;
+    \item for realized finite candidates, the plug-in smooth scores converge to $S_h(Y)$;
+    \item strict inequalities among finitely many limiting scores are eventually preserved.
 \end{enumerate}
-Thus the limiting hard-threshold-looking formula is used to compare finite candidates for the fixed-threshold smooth SURE objective at the observed matrix. It is not used to estimate the true MSE of a discontinuous hard-threshold estimator.
-
-There are two related caveats concerning data-dependent thresholds. For each fixed deterministic $\lambda$,
+Only the first statement is an unbiased-risk identity. It applies to a deterministic threshold:
 \begin{equation}
     \E\operatorname{SURE}_{\omega,\lambda}(Y)
     =\E\norm{\widehat X_{\omega,\lambda}(Y)-X}_F^2.
 \end{equation}
-However, the candidates in $\mathcal B(Y)$ are themselves functions of $Y$. Therefore, even for a fixed index $h$, one should not infer
-\begin{equation}
-    \E\operatorname{SURE}_{\omega,\lambda_h(Y)}(Y)
-    =
-    \E\norm{\widehat X_{\omega,\lambda_h(Y)}(Y)-X}_F^2
-\end{equation}
-from the fixed-threshold identity. If $\lambda_h(Y)$ is treated as part of the estimator, Stein's formula would involve the divergence of the full map $Y\mapsto\widehat X_{\omega,\lambda_h(Y)}(Y)$, not only the fixed-$\lambda$ divergence used in \eqref{eq:smooth-sure}. The plug-in quantity $\operatorname{SURE}_{\omega,\lambda_h(Y)}(Y)$ is therefore a numerical ranking score rather than an unbiased risk estimate for that data-dependent candidate.
-
-If a threshold is then selected from the same data, for example
-\begin{equation}
-    \widehat\lambda(Y)=\lambda_{\widehat h}(Y),\qquad
-    \widehat h\in
-    \arg\min_{1\leq h\leq k}
-    \operatorname{SURE}_{\omega,\lambda_h(Y)}(Y),
-\end{equation}
-then in general one should not expect
-\begin{equation}
-    \E\operatorname{SURE}_{\omega,\widehat\lambda(Y)}(Y)
-    =
-    \E\norm{\widehat X_{\omega,\widehat\lambda(Y)}(Y)-X}_F^2.
-\end{equation}
-The reason is the familiar data-reuse or optimism effect in model and tuning-parameter selection: the chosen threshold is selected partly because its realized score is small \cite{efron1986biased,efron2004prediction}. This does not invalidate SURE-based minimization as a principled tuning strategy; it only means that the selected score should not be reported as an unbiased risk estimate. The contribution of this paper is therefore the fixed-threshold unbiased SURE construction and the efficient finite-candidate ranking formula, not an unbiased risk estimator for data-dependent thresholds.
+Once the midpoint candidates $\lambda_h(Y)$ are computed from the observed singular values, or once a threshold is selected by minimizing the same scores, this identity no longer applies automatically. The divergence of the resulting map would include the dependence of the chosen threshold on $Y$, and the selected score has the usual optimism of model and tuning-parameter selection \cite{efron1986biased,efron2004prediction}. Thus SURE minimization is used here as a tuning rule, not as an unbiased post-selection risk estimator.
 
 \section{Empirical Evaluation}
 
-This section records five numerical components. The first three are deliberately modest checks of the theory and its interpretation: they verify the implementation of the fixed-threshold SURE formula, illustrate the post-selection caveat, and compare the induced rank-selection rule with an oracle benchmark and with residual-energy matching on controlled matrix examples. The last two components then embed the same rule in the complete SVD-based image denoising pipeline and compare it with classical image denoising methods under fixed experimental controls. The empirical claims should therefore be read in the same way as the theory: the SURE contribution is the replacement of the rank-selection rule, not a new patch-search, aggregation, or post-processing architecture.
+This section reports three matrix-level checks and one illustrative image comparison. The matrix experiments verify fixed-threshold SURE, illustrate post-selection optimism, and compare the induced rank rule with an oracle and residual-energy matching. The image experiment inserts the same rank-selection rule into the original SVD denoising pipeline. It is a fixed-realization pipeline check: the empirical contribution is the local rank-rule replacement, not a new patch-search or aggregation architecture and not a statistically powered benchmark.
 
-For the first three matrix-level experiments, we use the following diagnostic patch construction. First, eight gray-scale images are loaded from the Set12 data set and their pixel values are normalized to the interval $[0,1]$. Second, from each image we extract all overlapping $32\times32$ patches using a sliding window with stride four pixels. Thus a $256\times256$ image gives
-\begin{equation}
-    \left(\frac{256-32}{4}+1\right)^2=3249
-\end{equation}
-patches, while a $512\times512$ image gives
-\begin{equation}
-    \left(\frac{512-32}{4}+1\right)^2=14641
-\end{equation}
-patches. Third, three query patches are sampled uniformly at random from each image, giving $24$ query patches in total. Fourth, for each query patch, normalized cross-correlation is computed against all other patches from the same image, and the top $50$ most similar patches are retained for diagnostic purposes; this diagnostic matching rule is separate from the full image-denoising patch search specified later in Algorithm \ref{alg:sure-svd}. Fifth, in the numerical risk experiments reported below, the clean signal matrix $X$ is the query patch itself, viewed as a $32\times32$ matrix. No rank truncation is applied to $X$ before adding noise; all $32$ singular values of $X$ are retained and recorded.
-
-The patch-group illustration documents the data construction, but it is not one of the three validation plots. It is included here as an unnumbered setup display so that the numbering of the three main empirical figures remains unchanged.
-\begin{center}
-\makebox[\textwidth][c]{\includegraphics[width=1.28\textwidth]{figures/fig_diagnostic_patch_group_schematic.png}}
-\par\smallskip
-{\scriptsize Patch construction schematic: a query patch is extracted from a normalized grayscale image, compared with patches from the same image by normalized cross-correlation, and associated with its nearest patch neighbours. The matrix-level experiments below use the query patch itself as the clean matrix $X$.\par}
-\end{center}
-
-In these matrix-level experiments, a clean query matrix $X\in\R^{32\times32}$ is treated as fixed and independent Gaussian noise is added according to
+For the matrix-level experiments, eight Set12 images are normalized to $[0,1]$, overlapping $32\times32$ patches are extracted with stride four, and three query patches are sampled from each image. For each query patch, normalized cross-correlation is computed against all other patches from the same image, and the top $50$ most similar patches are retained for the diagnostic patch-group display; this matching step is separate from the full image-denoising patch search in Algorithm \ref{alg:sure-svd}. In the numerical risk experiments, the clean matrix $X\in\R^{32\times32}$ is the query patch itself, with no rank truncation before adding independent Gaussian noise
 \begin{equation}
     Y_r=X+W_r,
     \qquad
@@ -423,11 +397,18 @@ Losses are measured by the Frobenius error
 \begin{equation}
     L(\widehat X;X,Y_r)=\norm{\widehat X(Y_r)-X}_F^2.
 \end{equation}
-When an oracle rank is reported, it is computed using the clean matrix $X$ and is therefore not available to a practical denoising method. Its only purpose is to provide a lower benchmark within the same finite candidate family. The implementation-level values of $N$, the random seeds, the tested $\tau$ values, the deterministic $\lambda$ and $\omega$ grids, the candidate rank set $\mathcal H$, the tie-breaking rule, and the near-tie tolerance for denominators $\sigma_i^2-\sigma_j^2$ are not theoretical parameters; they must be reported with the replication code to make Figures \ref{fig:exp1-sure-unbiasedness}--\ref{fig:exp3-oracle-comparison} exactly reproducible. The implementation of the proposed method and all experimental scripts are available at \url{https://github.com/ECFDPB/SURE-SVD-Denoising}.
+Oracle ranks use the clean matrix $X$ only as a benchmark and are not available to a practical denoising method. Implementation details such as random seeds, grids, tie breaking and near-tie tolerances are recorded in the replication code at \url{https://github.com/ECFDPB/SURE-SVD-Denoising}.
+
+The patch-group illustration documents the data construction, but it is not one of the three validation plots. It is included here as an unnumbered setup display so that the numbering of the three main empirical figures remains unchanged.
+\begin{center}
+\makebox[\textwidth][c]{\includegraphics[width=1.28\textwidth]{figures/fig_diagnostic_patch_group_schematic.png}}
+\par\smallskip
+{\scriptsize Patch construction schematic: a query patch is extracted from a normalized grayscale image, compared with patches from the same image by normalized cross-correlation, and associated with its nearest patch neighbours. The matrix-level experiments below use the query patch itself as the clean matrix $X$.\par}
+\end{center}
 
 \subsection{Monte Carlo check of fixed-threshold unbiasedness}
 
-The first experiment tests Proposition \ref{prop:sure-unbiased}. The crucial point is that the thresholds in this experiment are fixed deterministic numerical inputs. Thus the experiment is matched to the theorem: for each prescribed pair $(\omega,\lambda)$, the estimator $\widehat X_{\omega,\lambda}$ is evaluated over many independent replicates, and the two Monte Carlo averages
+The first experiment tests Proposition \ref{prop:sure-unbiased} with fixed deterministic $(\omega,\lambda)$. Over independent replicates we compare
 \begin{equation}
     \widehat R_{\omega,
     \lambda}
@@ -441,16 +422,17 @@ The first experiment tests Proposition \ref{prop:sure-unbiased}. The crucial poi
     \operatorname{SURE}_{\omega,
     \lambda}(Y_r)
 \end{equation}
-are compared. If the closed-form divergence in \eqref{eq:smooth-sure} is implemented correctly, these two averages should agree up to Monte Carlo error.
+which should agree up to Monte Carlo error.
 
-Figure \ref{fig:exp1-sure-unbiasedness} shows that this is the case. In panel (a), each point represents one choice of patch, threshold, and smoothness, and the points lie on the diagonal $y=x$. Panel (b) reports the absolute relative discrepancy
+Figure \ref{fig:exp1-sure-unbiasedness} shows the expected agreement. Panel (a) compares Monte Carlo mean SURE with Monte Carlo mean loss, and panel (b) reports the absolute relative discrepancy
 \begin{equation}
     \frac{|\widehat S_{\omega,
     \lambda}-\widehat R_{\omega,
     \lambda}|}{\widehat R_{\omega,
     \lambda}}
 \end{equation}
-as a function of $\omega$. The discrepancies remain small over the tested range of smoothing parameters, including large $\omega$ where the logistic shrinker is close to hard thresholding away from the threshold. This is consistent with the theoretical statement: for every finite $\omega$ and deterministic $\lambda$, the smooth spectral map is Lipschitz and its SURE formula is unbiased. The observed nonzero discrepancies are finite Monte Carlo errors, not evidence of systematic bias.
+as a function of $\omega$. The discrepancies remain small over the tested range of smoothing parameters, including large $\omega$ where the logistic shrinker
+is close to hard thresholding away from the threshold. This is consistent with the theoretical statement. The observed nonzero discrepancies are finite Monte Carlo errors, not evidence of systematic bias.
 
 \begin{figure}[t]
 \centering
@@ -472,21 +454,19 @@ as a function of $\omega$. The discrepancies remain small over the tested range 
 
 \subsection{Post-selection optimism and low-risk rank selection}
 
-The second experiment addresses the caveat in Section 4. For a fixed observed noisy matrix $Y_r$, the limiting scores $S_h(Y_r)$ in \eqref{eq:limiting-score} are used as plug-in numerical ranking scores over a finite rank set $\mathcal H$. The selected rank is
+The second experiment illustrates the caveat in Section 4. For each noisy matrix, the limiting scores are minimized over a finite rank set $\mathcal H$ to select rank:
 \begin{equation}
     \widehat h_{\mathrm{SURE}}(Y_r)
     \in\arg\min_{h\in\mathcal H} S_h(Y_r).
 \end{equation}
-The selected score $S_{\widehat h_{\mathrm{SURE}}}(Y_r)$ is then compared with the true loss of the estimator selected by the same rule. The oracle rank is
+The selected score $S_{\widehat h_{\mathrm{SURE}}}(Y_r)$ is compared with the true loss of the selected estimator and with the oracle rank
 \begin{equation}
     h_{\mathrm{or}}(Y_r)
     \in\arg\min_{h\in\mathcal H} L(\widehat X_h;X,Y_r),
 \end{equation}
-where $\widehat X_h$ denotes the hard rank-$h$ truncation of $Y_r$. This oracle is used only to measure how much excess loss is incurred by the data-driven rank selection.
+where $\widehat X_h$ is the hard rank-$h$ truncation. This oracle is used only to measure how much excess loss is incurred by the data-driven rank selection.
 
-Figure \ref{fig:exp2-postselection} separates two facts that should not be conflated. First, panel (a) shows that the average selected SURE score is below the average true loss of the SURE-selected estimator. Panel (b) gives the same phenomenon at the replicate level: the point cloud lies predominantly below the diagonal. This is the expected optimism caused by minimizing a noisy risk estimate over ranks. Consequently, the selected SURE value should not be reported as an unbiased estimate of the selected estimator's risk.
-
-Second, the true loss of the SURE-selected rank is close to the oracle loss in panel (a). Thus the post-selection score is biased downward as a risk estimate, but the rank chosen by minimizing it can still have near-oracle loss. This is precisely the interpretation used in the paper: the plug-in SURE score is a tuning criterion for ranking candidates, not an unbiased post-selection risk estimator.
+Figure \ref{fig:exp2-postselection} shows both effects: the selected SURE score is optimistic as a risk estimate, but the SURE-selected rank has true loss close to the oracle. Thus the score is used as a tuning criterion, not as an unbiased post-selection risk estimate.
 
 \begin{figure}[t]
 \centering
@@ -508,7 +488,7 @@ Second, the true loss of the SURE-selected rank is close to the oracle loss in p
 
 \subsection{Oracle-style comparison with energy matching}
 
-The third experiment compares three rank-selection rules over several noise levels $\tau$. The oracle rule chooses the best rank using $X$ and is included only as a benchmark. The proposed SURE rule chooses the rank minimizing $S_h(Y)$. The energy-matching baseline chooses a rank by comparing the discarded singular-value energy with the nominal noise energy, following the residual-energy principle described in the introduction.
+The third experiment compares oracle, SURE and residual-energy rank selection over several noise levels $\tau$. The oracle rule chooses the best rank using $X$ and is included only as a benchmark.
 
 For a method $M$, define its empirical oracle efficiency at noise level $\tau$ by
 \begin{equation}
@@ -518,7 +498,7 @@ For a method $M$, define its empirical oracle efficiency at noise level $\tau$ b
 \end{equation}
 Values close to one indicate near-oracle performance, while smaller values indicate larger excess risk.
 
-Figure \ref{fig:exp3-oracle-comparison} shows that the SURE rule closely tracks the oracle curve across the tested noise levels. In the raw MSE plot, the SURE and oracle curves are nearly indistinguishable relative to the energy-matching baseline. In the efficiency plot, SURE remains close to one, whereas the energy-matching rule has visibly lower efficiency. This agrees with the theoretical motivation of the paper: residual-energy matching does not correct for the fact that the fitted low-rank approximation absorbs part of the noise, whereas the SURE score includes the degrees-of-freedom correction coming from Stein's identity.
+Figure \ref{fig:exp3-oracle-comparison} shows that SURE closely tracks the oracle curve and has higher oracle efficiency than residual-energy matching, consistent with the degrees-of-freedom correction in the SURE score.
 
 \begin{figure}[t]
 \centering
@@ -541,60 +521,67 @@ Figure \ref{fig:exp3-oracle-comparison} shows that the SURE rule closely tracks 
 
 \subsection{Complete SVD denoising pipelines}
 
-The preceding experiments isolate the rank-selection rule at the level of a single noisy matrix. The full image-denoising experiments below use the original SVD-pipeline patch construction, not the diagnostic $32\times32$ query-patch construction used in the first three matrix-level experiments. This is the common mathematical core of both synthetic low-rank matrix denoising and patch-based image denoising. In the synthetic setting one observes
+The preceding experiments isolate rank selection for one noisy matrix. The image-denoising experiment applies the same local SVD truncation primitive to patch-group matrices. In the synthetic setting one observes
 \begin{equation}
     Y=X+W,
     \qquad W_{ab}\stackrel{\mathrm{i.i.d.}}{\sim}N(0,\tau^2),
 \end{equation}
-computes the SVD of $Y$, selects a rank $h$, and returns the hard rank-$h$ truncation. In the image setting the same operation is applied locally: for each reference patch, similar patches are stacked into a group matrix $P_j\in\R^{m\times n_j}$, and the SVD truncation is performed on $P_j$. This connection should be understood as a controlled algorithmic transfer of the rank-selection primitive. Because patch groups are selected from the noisy image and overlapping patches induce dependence among entries, the complete image pipeline is not itself a direct instance of the fixed deterministic-matrix model used in the SURE proof.
+computes the SVD of $Y$, selects a rank $h$, and returns the hard rank-$h$ truncation. In the image setting this operation is applied to group matrices $P_j\in\R^{m\times n_j}$ formed from similar patches. This is an algorithmic transfer, not a direct application of the fixed deterministic-matrix model, because grouping, overlap, aggregation and back projection are data-dependent pipeline operations.
 
-The original method of Guo et al.\ \cite{guo2016efficient} groups similar patches, denoises each group matrix by SVD truncation, aggregates the reconstructed patches, applies back projection, and repeats the same procedure in a refinement pass. Its rank-selection rule is based on residual-energy matching: for $P_j\in\R^{m\times n_j}$ with $k_j=\min(m,n_j)$ and singular values $\sigma_{j,1}\geq\cdots\geq\sigma_{j,k_j}$, it chooses the smallest retained rank satisfying
+The original method of Guo et al.\ \cite{guo2016efficient} uses residual-energy matching: for $P_j\in\R^{m\times n_j}$ with $k_j=\min(m,n_j)$ and singular values $\sigma_{j,1}\geq\cdots\geq\sigma_{j,k_j}$, it chooses the smallest rank satisfying
 \begin{equation}
     \sum_{i=h+1}^{k_j}\sigma_{j,i}^{2}
     \leq m n_j\tau^2.
 \end{equation}
-The SURE-modified method keeps this complete pipeline fixed but replaces the local rank rule. For each group matrix, the implementation includes the zero-rank candidate
+The SURE-modified method keeps the pipeline fixed but replaces this local rank rule by
 \begin{equation}
-    S_0(P_j)=\norm{P_j}_F^2-m n_j\tau^2,
+\begin{aligned}
+    S_0(P_j)&=\norm{P_j}_F^2-m n_j\tau^2,\\[-0.2em]
+    S_h(P_j)&=-m n_j\tau^2+
+    \sum_{i=h+1}^{k_j}\sigma_{j,i}^{2}\\[-0.2em]
+    &\quad+2\tau^2\Biggl\{|m-n_j|h+h\\[-0.2em]
+    &\qquad\qquad
+    +2\sum_{i=1}^{h}\sum_{\substack{\ell=1\\ \ell\neq i}}^{k_j}
+        \frac{\sigma_{j,i}^{2}}{\sigma_{j,i}^{2}-\sigma_{j,\ell}^{2}}
+    \Biggr\},\quad h=1,\ldots,k_j,
+\end{aligned}
 \end{equation}
-uses \eqref{eq:limiting-score} for $h\geq1$ with the dimensions and singular values of $P_j$, and selects
+and selects
 \begin{equation}
     \widehat h_j\in\arg\min_{0\leq h\leq k_j}S_h(P_j).
 \end{equation}
-The denoised group is then obtained by the rank-$\widehat h_j$ hard truncation. Consequently, the only algorithmic substitution from the original pipeline to the proposed pipeline is the replacement of residual-energy matching by SURE limiting-score minimization.
+The denoised group is the rank-$\widehat h_j$ hard truncation, so the only algorithmic substitution from the original pipeline to the proposed pipeline is the replacement of residual-energy matching by SURE limiting-score minimization.
 
-Figure \ref{fig:sure-modified-pipeline} and Algorithm \ref{alg:sure-svd} are placed on the same page to show the proposed pipeline and its implementation-level steps together. The figure displays only the SURE-modified pipeline, and the algorithm makes explicit where the theoretical score enters the image denoising procedure: the SURE rank-selection step changes the retained rank, while the surrounding patch-processing operations are inherited from the original SVD-based method.
+Figure \ref{fig:sure-modified-pipeline} and Algorithm \ref{alg:sure-svd} summarize the modified pipeline and its implementation-level steps.
 
 \clearpage
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.88\textwidth]{figures/exp11.png}
+\includegraphics[width=0.80\textwidth]{figures/exp11.png}
 \caption{SURE-modified two-pass SVD denoising pipeline. The method uses the original patch grouping, SVD truncation, aggregation, back projection, and refinement structure; only the local rank-selection rule inside each grouped-patch SVD block is changed.}
 \label{fig:sure-modified-pipeline}
 \end{figure}
 
-\vspace{0.35em}
+\vspace{0.15em}
 \input{figures/algorithm_box.tex}
 
 \clearpage
 
-\subsection{Comparison with classical denoising methods}
+\subsection{Illustrative comparison with classical denoising methods}
 
-We finally compare the SURE-modified SVD pipeline with K-SVD \cite{elad2006image}, LPG-PCA \cite{zhang2010two}, BM3D \cite{dabov2007image}, the original MATLAB SVD pipeline using the energy-matching rank rule, and the proposed SURE rule. The test set is Set12, consisting of twelve standard 8-bit gray-scale images of size $256\times256$ or $512\times512$. The tested noise levels are
+We finally give an illustrative fixed-realization comparison involving K-SVD \cite{elad2006image}, LPG-PCA \cite{zhang2010two}, BM3D \cite{dabov2007image}, the original energy-matching SVD pipeline, and the SURE-modified SVD pipeline on Set12. The tested 8-bit noise levels are
 \begin{equation}
     \sigma\in\{10,20,30,50\}
 \end{equation}
-on the 8-bit intensity scale. For image index $i$ and noise level $\sigma$, the noisy image is generated in MATLAB after setting
+For image index $i$, the noisy image is generated after setting
 \begin{equation}
     \operatorname{rng}(100i+\sigma),
     \qquad
     y=x+\sigma Z,
     \qquad Z_{ab}\stackrel{\mathrm{i.i.d.}}{\sim}N(0,1).
 \end{equation}
-The resulting noisy image is saved as a \texttt{.mat} file and reused by all MATLAB and Python methods. Thus, for every image--noise pair, all methods are evaluated on exactly the same noisy realization.
-
-The K-SVD experiment uses Ron Rubinstein's official MATLAB toolboxes \texttt{ksvdbox13} and \texttt{ompbox10}. The only code change is a MATLAB R2026a compatibility fix replacing a non-scalar use of \texttt{||} by elementwise \texttt{|}; the algorithmic logic is unchanged. The \texttt{ompbox10} C mex files are compiled natively for Apple Silicon. The parameters are
+For each image--noise pair, all methods use the same single noisy realization. K-SVD uses Ron Rubinstein's MATLAB implementation (\texttt{ksvdbox13}, \texttt{ompbox10}) with parameters
 \begin{equation}
 \begin{gathered}
     \texttt{blocksize}=8,
@@ -606,49 +593,26 @@ The K-SVD experiment uses Ron Rubinstein's official MATLAB toolboxes \texttt{ksv
     \quad \texttt{memusage}=\texttt{'high'}.
 \end{gathered}
 \end{equation}
-LPG-PCA uses the official MATLAB code of Zhang et al. with no code modification, profile \texttt{'fast'}, and $K=0$, so no boundary cropping is applied. BM3D uses the official Tampere University Python package \texttt{bm3d} version 4.0.3. Images are normalized to $[0,1]$, the noise parameter is $\sigma/255$, and the output is rescaled to $[0,255]$. The Python implementation is used because the official MATLAB BM3D mex files do not support the Apple Silicon architecture used for these experiments.
+LPG-PCA uses the official MATLAB code of Zhang et al. with profile \texttt{'fast'} and $K=0$. BM3D uses the Tampere University Python package \texttt{bm3d} version 4.0.3, with images normalized to $[0,1]$ and rescaled after denoising. The energy-matching and SURE columns are the controlled comparison of interest: they use identical Python pipeline code and differ only in the rank-selection function. The other methods are included only to provide context for the fixed-realization image-denoising scale. Their shared parameters are patch size $9\times9$, $10\times10$, or $11\times11$ according to noise level; $L=85$ similar patches; search-window half-size $35$; reference-patch stride $3$; back-projection parameter $\delta=0.5$; and, in the experiments, noise-update scaling factor $\gamma=0.65$.
 
-The energy-matching and SURE columns are the controlled comparison of interest. Both pipelines operate on the 8-bit image-intensity scale, so the noise standard deviation in Algorithm \ref{alg:sure-svd} is $\tau=\sigma$; for normalized $[0,1]$ images the noise level and patch-size thresholds must be rescaled consistently. Both are original MATLAB implementations of the same SVD denoising pipeline: patch extraction, block matching, SVD factorisation, rank truncation, aggregation, back projection, noise-level update and the two-pass structure are identical. The shared parameters are patch size $9\times9$ for $\sigma<20$, $10\times10$ for $20\leq\sigma<40$, and $11\times11$ for $\sigma\geq40$; $L=85$ similar patches; search-window half-size $35$; reference-patch stride $3$; back-projection parameter $\delta=0.5$; and noise-update parameter $\gamma=0.65$. The only difference is the rank-selection function: energy matching uses the residual-energy criterion above, whereas SURE uses the minimizer of $S_h$.
-
-\begin{table}[t]
-\centering
-\caption{Experimental controls in the denoising comparison.}
-\label{tab:experimental-controls}
-{\small
-\begin{tabular}{@{}p{0.28\textwidth}p{0.64\textwidth}@{}}
-\toprule
-Control variable & Implementation detail \\
-\midrule
-Noisy images & Fixed by $\operatorname{rng}(100i+\sigma)$, saved as \texttt{.mat} files, and reused by all methods. \\
-Pipeline isolation & Energy matching and SURE use identical MATLAB pipeline code; only the rank-selection function differs. \\
-Metrics & PSNR and SSIM use the same full-image definitions for all methods. \\
-Boundary handling & All methods are evaluated on the complete image; no boundary cropping is used. \\
-Environment & MATLAB R2026a on Apple Silicon macOS, and Python 3.13.5 with \texttt{bm3d} version 4.0.3. \\
-\bottomrule
-\end{tabular}
-}
-\end{table}
-
-All reported PSNR and SSIM values are computed on the full image, with no boundary cropping. PSNR is computed on the 8-bit scale. SSIM uses the same definition for all methods: an $11\times11$ Gaussian window with standard deviation $1.5$, constants
+PSNR is computed on the full image on the 8-bit scale. SSIM uses an $11\times11$ Gaussian window with standard deviation $1.5$, constants
 \begin{equation}
     C_1=(0.01\cdot255)^2,
     \qquad
     C_2=(0.03\cdot255)^2,
 \end{equation}
-and the spatial average of the SSIM map. The MATLAB implementation uses \texttt{fspecial('gaussian',11,1.5)} and \texttt{conv2}; the Python BM3D evaluation uses the equivalent \texttt{scipy.ndimage.convolve} computation with the same Gaussian kernel.
+and the spatial average of the SSIM map, with equivalent MATLAB and Python convolution implementations.
 
 \input{figures/table_final_comparison.tex}
 
 \clearpage
 
-Table \ref{tab:final-comparison} reports the complete quantitative comparison. BM3D is the strongest method on average, with average PSNR/SSIM $30.32/0.8486$, which is expected for a highly optimized transform-domain collaborative filtering method. The relevant controlled comparison for this paper is between the two SVD columns. Replacing the residual-energy rank rule by the SURE rank rule changes the average result from $29.99/0.8398$ to $30.07/0.8438$. Across the $48$ individual image--noise settings, SURE improves over energy matching in $32$ PSNR entries and $31$ SSIM entries. The gains are modest and are reported for one fixed noisy realization per image--noise pair, with averages computed before rounding. They are strongest at the larger tested noise levels and are not uniform at $\sigma=10$. Nevertheless, within this controlled implementation they are obtained while keeping every patch-processing and aggregation parameter fixed, so they can be attributed to the rank-selection rule studied in the preceding sections.
-
-Figure \ref{fig:visual-house-sigma50} gives an illustrative visual comparison on the House image at the strongest tested noise level, $\sigma=50$. The same noisy realization is used for all denoising methods, and the displayed PSNR values are computed on the full image. In this particular case, the proposed SURE rule slightly exceeds BM3D in PSNR and improves the SVD-based result relative to energy matching under the identical patch pipeline. The example is intended to illustrate qualitative behaviour, not to replace the full table.
+Table \ref{tab:final-comparison} reports this fixed-realization comparison. BM3D, K-SVD and LPG-PCA are included as external reference points, but the controlled comparison for this paper is between the two SVD columns, where every pipeline component is shared except the rank-selection rule. In this setting, replacing residual-energy rank selection by SURE changes the average from $29.99/0.8398$ to $30.07/0.8438$, with improvements over energy matching in $32$ of $48$ PSNR entries and $31$ of $48$ SSIM entries. Because these are single noisy realizations and the average gain is small, these numbers should be read as modest descriptive evidence for the rank-selection replacement, not as a claim of statistical significance or superiority over existing denoising methods. The gains are strongest at the larger tested noise levels and are not uniform at $\sigma=10$. Figure \ref{fig:visual-house-sigma50} gives one qualitative high-noise example on House at $\sigma=50$.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.76\textwidth]{figures/fig_visual_house_sigma50.png}
-\caption{Visual comparison on the House image corrupted by additive white Gaussian noise with $\sigma=50$. Panels show the original image, the shared noisy input, and the denoised outputs from K-SVD, LPG-PCA, BM3D, energy matching, and the proposed SURE method. PSNR values are reported below the corresponding method labels.}
+\includegraphics[width=0.88\textwidth]{figures/fig_visual_house_sigma50.png}
+\caption{Illustrative visual comparison on the House image corrupted by additive white Gaussian noise with $\sigma=50$. Panels show the original image, the shared noisy input, and the denoised outputs from K-SVD, LPG-PCA, BM3D, energy matching, and the SURE-modified SVD pipeline. PSNR values are reported below the corresponding method labels for this single realization.}
 \label{fig:visual-house-sigma50}
 \end{figure}
 
@@ -659,10 +623,10 @@ Figure \ref{fig:visual-house-sigma50} gives an illustrative visual comparison on
 This paper proposes a SURE-based threshold-ranking framework for SVD low-rank denoising. The central contribution is a reinterpretation of a biased hard-threshold SURE-like expression. We accept the negative result that singular value hard thresholding itself does not satisfy Stein's lemma \cite{hansen2017comment}; nevertheless, by introducing a smooth hard-threshold approximation, we obtain a fixed-threshold estimator whose SURE is exactly unbiased under Gaussian noise. For a fixed observed matrix and a finite candidate set separated from the singular values, strict inequalities in the limiting scores are eventually preserved by the smooth SURE objective as $\omega\to\infty$. This provides a computational ranking rule for finite-candidate SURE-based threshold tuning under the separation and post-selection caveats stated above. As in other data-driven SURE tuning methods, the selected threshold should be distinguished from the fixed-threshold estimators used to construct the unbiased risk estimates.
 
 \paragraph{Limitations.}
-The method has six important limitations. First, the ordering argument applies only to a finite set of thresholds separated from the observed singular values. It does not justify continuous optimization over all $\lambda\in\R$. Second, the noncoincidence condition $\lambda\neq\sigma_i$ is essential for the pointwise limit; while it holds by construction for \eqref{eq:candidate-set}, it should not be ignored in theoretical statements. Third, the limiting score compares candidate thresholds but does not estimate the true risk of hard thresholding. Fourth, the SURE value obtained after minimizing over candidate thresholds is generally optimistic as an estimate of the selected estimator's risk; this is the usual post-selection issue in data-driven risk-estimate minimization and does not affect the fixed-threshold unbiasedness result. Fifth, in the full image pipeline, block matching and overlapping patch aggregation introduce data-dependent grouping and dependence beyond the fixed-matrix Gaussian model used in the proof. Sixth, the final denoising table uses one fixed noisy realization per image--noise pair; more random seeds would be needed to attach standard errors to the modest average gains.
+The limitations are as follows. The ordering argument is finite-candidate and pointwise: thresholds must be separated from the observed singular values, and the result does not justify continuous optimization over all $\lambda\in\R$. The limiting score ranks candidates but is not an unbiased risk estimate for discontinuous hard thresholding or for a data-selected threshold. In the image pipeline, block matching and overlapping aggregation go beyond the fixed-matrix Gaussian model used in the proof. Finally, the denoising table is a fixed-realization comparison; multiple noisy seeds would be needed for standard errors or formal significance tests.
 
 \paragraph{Future work.}
-Future work may proceed in several directions. One direction is to test the proposed rule empirically on more image denoising and matrix recovery benchmarks. A second direction is to study post-selection risk correction for the selected threshold, for example through covariance-penalty or sample-splitting ideas. A third direction is to extend the finite-candidate smoothing principle to other nonsmooth estimators, such as estimators arising from $\ell_1$ regularization or margin-based learning. A fourth direction is to develop a mathematically controlled continuous-threshold theory that preserves the fixed-threshold unbiased-risk interpretation while allowing gradient-based optimization.
+Future work includes broader matrix and image benchmarks, post-selection risk correction, extensions to other nonsmooth estimators, and a controlled continuous-threshold theory compatible with the fixed-threshold SURE interpretation.
 
 \begin{thebibliography}{14}
 

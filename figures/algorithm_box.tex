@@ -9,10 +9,10 @@
 \vspace{0.25em}
 {\tiny
 \begin{algorithmic}[1]
-\REQUIRE Noisy image $\mathbf y$ on the 8-bit intensity scale, noise standard deviation $\tau$ on the same scale
+\REQUIRE Noisy image $\mathbf y\in\R^{H\times W}$ on the 8-bit intensity scale, noise standard deviation $\tau$ on the same scale
 \ENSURE Denoised image $\widehat{\mathbf x}$
 \STATE \textbf{Stage 1: initial denoising.}
-\STATE Extract overlapping $\sqrt m\times\sqrt m$ patches from $\mathbf y$. For each reference patch, find the $L$ most similar patches using $S(\mathbf y_j,\mathbf y_c)=\|\mathbf y_j-\mathbf y_c\|_2^2$, and form $P_j=[\mathbf y_j,\mathbf y_{c,1},\ldots,\mathbf y_{c,L}]\in\R^{m\times n_j}$, where $n_j=L+1$.
+\STATE Extract overlapping $\sqrt m\times\sqrt m$ patches from $\mathbf y$; the reference-patch stride selects reference locations, and the search-window half-size restricts candidates. For each reference patch, select the $L$ closest patches by $S(\mathbf y_j,\mathbf y_c)=\|\mathbf y_j-\mathbf y_c\|_2^2$ and form $P_j=[\mathbf y_j,\mathbf y_{c,1},\ldots,\mathbf y_{c,L}]\in\R^{m\times n_j}$, where $n_j=L+1$.
 \FOR{each group matrix $P_j$, $j=1,\ldots,C$}
     \STATE Compute $P_j=U_j\diagop(\sigma_{j,1},\ldots,\sigma_{j,k_j})V_j^T$, where $k_j=\min(m,n_j)$.
     \STATE Choose the SURE rank $\widehat h_j\in\arg\min_{h\in\{0,1,\ldots,k_j\}}S_h(P_j)$, where
@@ -29,15 +29,14 @@
     \STATE Set $w_j=1-\widehat h_j/(L+1)$ if $\widehat h_j<L+1$, and $w_j=1/(L+1)$ otherwise.
 \ENDFOR
 \STATE Aggregate all $\widehat Q_j$ by weighted averaging to obtain $\widehat{\mathbf x}_0$.
-\STATE \textbf{Back projection:} form $\widetilde{\mathbf y}=\widehat{\mathbf x}_0+\delta(\mathbf y-\widehat{\mathbf x}_0)$ with $\delta=0.5$, and update $\widetilde\tau=\gamma\sqrt{\max\{\tau^2-\|\widetilde{\mathbf y}-\widehat{\mathbf x}_0\|_F^2/(HW),0\}}$ with $\gamma=0.65$.
+\STATE \textbf{Back projection:} form $\widetilde{\mathbf y}=\widehat{\mathbf x}_0+\delta(\mathbf y-\widehat{\mathbf x}_0)$ with $\delta=0.5$, and update $\widetilde\tau=\gamma\sqrt{\max\{\tau^2-\|\widetilde{\mathbf y}-\widehat{\mathbf x}_0\|_F^2/(HW),0\}}$, where $\gamma$ is a scaling factor.
 \STATE \textbf{Stage 2: refinement.} Repeat Stage~1 on $\widetilde{\mathbf y}$ with noise level $\widetilde\tau$ to obtain $\widehat{\mathbf x}$.
 \end{algorithmic}
 \medskip
 \noindent\textbf{Parameters:} patch size $9\times9$ if $\tau<20$, $10\times10$ if $20\leq\tau<40$, and $11\times11$ if $\tau\geq40$; these thresholds use the 8-bit scale; similar patches $L=85$; search-window half-size $35$; reference-patch stride $3$.
 
 \vspace{0.2em}
-{\setlength{\baselineskip}{0.82\baselineskip}\selectfont
-\noindent\textbf{Remark:} The only modification relative to Guo et al.\ \cite{guo2016efficient} is the rank-selection rule: energy matching is replaced by SURE-based limiting-score minimization. Patch grouping, SVD factorisation, truncation, aggregation and back projection remain identical.\par}
+{\noindent\textbf{Remark:} The only modification relative to Guo et al.\ \cite{guo2016efficient} is the rank-selection rule: energy matching is replaced by SURE-based limiting-score minimization. Patch grouping, SVD factorisation, truncation, aggregation and back projection remain identical. The branch $w_j=1/(L+1)$ for a full-rank group is the positive fallback aggregation weight inherited from the original LRA-SVD rule, rather than the continuous extension $1-\widehat h_j/(L+1)=0$.\par}
 }
 \vspace{0.25em}
 \hrule
