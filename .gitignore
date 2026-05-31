@@ -18,3 +18,13 @@ __pycache__/
 # IDE
 .idea/
 .vscode/
+
+# Paper / presentation (not experiment code)
+main.tex
+figures/
+*.pdf
+.Rhistory
+SURE_SVD/exp4_pipeline/fig_pipeline.py
+SURE_SVD/exp5_benchmark/generate_final_table.py
+SURE_SVD/exp5_benchmark/save_visual_house.m
+SURE_SVD/exp5_benchmark/table_final_comparison.txt

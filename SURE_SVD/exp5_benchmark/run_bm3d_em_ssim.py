@@ -13,7 +13,7 @@ OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 noisy_dir = os.path.join(OUT_DIR, 'noisy_images')
 
 img_names = [f'{i:02d}.png' for i in range(1, 13)]
-sigmas = [10, 20, 30, 50]
+sigmas = [10, 30, 50]
 
 
 def gaussian_kernel(size, sigma):

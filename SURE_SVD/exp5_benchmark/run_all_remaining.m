@@ -7,7 +7,7 @@ close all; clc;
 img_dir = '../set12/';
 img_names = {'01.png','02.png','03.png','04.png','05.png','06.png',...
              '07.png','08.png','09.png','10.png','11.png','12.png'};
-sigmas = [10, 20, 30, 50];
+sigmas = [10, 30, 50];
 
 addpath('../lra_svd/LRA_SVD');
 addpath('../ksvdbox13');
