@@ -98,8 +98,8 @@ def merge_results(bm3d_results):
                 ]:
                     p = float(mat[psnr_key][i, j]) if not np.isnan(mat[psnr_key][i, j]) else None
                     s = float(mat[ssim_key][i, j]) if not np.isnan(mat[ssim_key][i, j]) else None
-                    entry[method] = {'psnr': round(p, 2) if p else None,
-                                     'ssim': round(s, 4) if s else None}
+                    entry[method] = {'psnr': round(p, 2) if p is not None else None,
+                                     'ssim': round(s, 4) if s is not None else None}
                 # BM3D
                 if key in bm3d_results:
                     entry['bm3d'] = bm3d_results[key]

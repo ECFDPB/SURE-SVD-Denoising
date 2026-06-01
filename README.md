@@ -22,7 +22,8 @@ Code repository for the paper:
 │   │   └── energy_matching_svd_denoising.m # Energy matching baseline (same pipeline)
 │   ├── exp5_benchmark/         # Experiment 5: Set12 benchmark comparison
 │   │   ├── run_set12_benchmark.m          # Run K-SVD/LPG-PCA/EM/SURE (MATLAB)
-│   │   └── run_bm3d.py                   # Run BM3D (Python) + merge all results
+│   │   ├── run_bm3d.py                   # Run BM3D (Python) + merge all results
+│   │   └── results_set12.json            # Raw results (12 images × 3 sigmas × 5 methods)
 │   └── exp6_bsd68/             # Experiment 6: BSD68 statistical comparison
 │       ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
 │       └── results_bsd68.json            # Raw results (68 images × 3 sigmas)
@@ -98,7 +99,7 @@ noisy = clean + sigma * randn(H, W);
 
 Noise levels: σ ∈ {10, 30, 50}.
 
-The noisy images for Set12 are saved in `exp5_benchmark/noisy_images/` as `.mat` files for exact reproducibility.
+Pre-computed results are provided in `results_set12.json` (Set12, 5 methods) and `results_bsd68.json` (BSD68, Energy matching vs SURE).
 
 ## Citation
 
