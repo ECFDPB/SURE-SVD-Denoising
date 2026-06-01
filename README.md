@@ -21,13 +21,8 @@ Code repository for the paper:
 │   │   ├── sure_svd_denoising.m           # Proposed SURE-SVD method
 │   │   └── energy_matching_svd_denoising.m # Energy matching baseline (same pipeline)
 │   ├── exp5_benchmark/         # Experiment 5: Set12 benchmark comparison
-│   │   ├── run_all_remaining.m            # Run Guo/SURE/K-SVD/LPG-PCA (MATLAB)
-│   │   ├── run_em_ssim.m                  # Run Energy matching with SSIM
-│   │   ├── run_bm3d_em_ssim.py            # Run BM3D (Python official package)
-│   │   ├── noisy_images/                  # Saved noisy images (.mat) for reproducibility
-│   │   ├── results_all_matlab.mat         # MATLAB benchmark results
-│   │   ├── results_em_full.mat            # Energy matching results
-│   │   └── bm3d_final.json               # BM3D results
+│   │   ├── run_set12_benchmark.m          # Run K-SVD/LPG-PCA/EM/SURE (MATLAB)
+│   │   └── run_bm3d.py                   # Run BM3D (Python) + merge all results
 │   └── exp6_bsd68/             # Experiment 6: BSD68 statistical comparison
 │       ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
 │       └── analyze_bsd68.py               # Wilcoxon signed-rank test analysis
@@ -78,12 +73,11 @@ addpath('SURE_SVD/exp4_pipeline');
 In MATLAB:
 ```matlab
 cd SURE_SVD/exp5_benchmark
-run_all_remaining   % Runs Guo/SURE/K-SVD/LPG-PCA on Set12
-run_em_ssim         % Runs Energy matching
+run_set12_benchmark   % Runs K-SVD, LPG-PCA, Energy matching, SURE on Set12
 ```
-Then in Python:
+Then in Python (runs BM3D and merges all results into results_set12.json):
 ```bash
-python SURE_SVD/exp5_benchmark/run_bm3d_em_ssim.py
+python SURE_SVD/exp5_benchmark/run_bm3d.py
 ```
 
 ### Experiment 6: BSD68 Statistical Comparison
