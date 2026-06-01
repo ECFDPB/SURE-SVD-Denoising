@@ -37,3 +37,4 @@ SURE_SVD/exp5_benchmark/run_bm3d_em_ssim.py
 SURE_SVD/exp5_benchmark/results_all_matlab.mat
 SURE_SVD/exp5_benchmark/results_em_full.mat
 SURE_SVD/exp5_benchmark/bm3d_final.json
+SURE_SVD/exp6_bsd68/analyze_bsd68.py

@@ -25,7 +25,7 @@ Code repository for the paper:
 │   │   └── run_bm3d.py                   # Run BM3D (Python) + merge all results
 │   └── exp6_bsd68/             # Experiment 6: BSD68 statistical comparison
 │       ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
-│       └── analyze_bsd68.py               # Wilcoxon signed-rank test analysis
+│       └── results_bsd68.json            # Raw results (68 images × 3 sigmas)
 ├── ksvdbox13/                  # K-SVD official toolbox (Ron Rubinstein)
 ├── ompbox10/                   # OMP official toolbox (Ron Rubinstein)
 └── Program_lpgpca/             # LPG-PCA official code (Zhang et al.)
@@ -86,10 +86,7 @@ In MATLAB:
 cd SURE_SVD/exp6_bsd68
 run_bsd68_experiment   % 68 images × 3 noise levels = 204 paired trials
 ```
-Then in Python:
-```bash
-python SURE_SVD/exp6_bsd68/analyze_bsd68.py   # Wilcoxon signed-rank test
-```
+Results saved to `results_bsd68.json`.
 
 ## Reproducibility
 
