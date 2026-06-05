@@ -5,8 +5,7 @@
 %
 % Seed = rng(img_idx * 100 + sigma)
 % All methods use the SAME noisy image per (image, sigma) pair.
-% BM3D must be run separately in Python (run_bm3d.py) due to Apple Silicon.
-% Noisy images are saved as .mat for Python to load.
+% Results saved to results_set12_matlab.mat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 close all; clc;
 
@@ -30,10 +29,6 @@ psnr_em     = NaN(n_imgs, n_sigmas);  ssim_em     = NaN(n_imgs, n_sigmas);
 psnr_ksvd   = NaN(n_imgs, n_sigmas);  ssim_ksvd   = NaN(n_imgs, n_sigmas);
 psnr_lpg    = NaN(n_imgs, n_sigmas);  ssim_lpg    = NaN(n_imgs, n_sigmas);
 
-%% ── Create directory for noisy images (for Python BM3D) ─────────────────
-noisy_dir = 'noisy_images';
-if ~exist(noisy_dir, 'dir'), mkdir(noisy_dir); end
-
 %% ── Print experiment info ────────────────────────────────────────────────
 fprintf('═══════════════════════════════════════════════════════════════\n');
 fprintf('Set12 Benchmark: K-SVD, LPG-PCA, Energy matching, SURE\n');
@@ -55,10 +50,6 @@ for img_idx = 1:n_imgs
         rng(img_idx * 100 + sigma);
         noisy = clean + sigma * randn(H, W);
         fprintf('  sigma=%2d: ', sigma);
-
-        % Save noisy image as .mat for Python BM3D
-        noisy_filename = fullfile(noisy_dir, sprintf('%s_sigma%d.mat', img_names{img_idx}(1:end-4), sigma));
-        save(noisy_filename, 'noisy', 'clean', 'sigma');
 
         % ── Energy matching ──
         try
@@ -120,9 +111,7 @@ save('results_set12_matlab.mat', ...
      'psnr_lpg', 'ssim_lpg', ...
      'img_names', 'sigmas');
 fprintf('\n═══════════════════════════════════════════════════════════════\n');
-fprintf('MATLAB results saved to results_set12_matlab.mat\n');
-fprintf('Noisy images saved to %s/ for Python BM3D\n', noisy_dir);
-fprintf('Next: run "python run_bm3d.py" to complete BM3D results.\n');
+fprintf('Results saved to results_set12_matlab.mat\n');
 fprintf('═══════════════════════════════════════════════════════════════\n');
 
 %% ── Quick summary ────────────────────────────────────────────────────────
