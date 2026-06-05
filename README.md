@@ -33,10 +33,9 @@ Code repository for the paper:
 
 ## Requirements
 
-### Python (Experiments 1–3, BM3D, Statistical Analysis)
+### Python (Experiments 1–3, Statistical Analysis)
 - Python 3.10+
 - NumPy, SciPy, Matplotlib, Pillow, Pandas
-- `bm3d` (official package): `pip install bm3d`
 
 ### MATLAB (Experiments 4–6)
 - MATLAB R2023b+ (tested on R2026a, Apple Silicon)
@@ -72,7 +71,7 @@ addpath('SURE_SVD/exp4_pipeline');
 ### Experiment 5: BSD68 Statistical Comparison
 In MATLAB:
 ```matlab
-cd SURE_SVD/exp6_bsd68
+cd SURE_SVD/exp5_bsd68
 run_bsd68_experiment   % 68 images × 3 noise levels = 204 paired trials
 ```
 Results saved to `results_bsd68.json`.
@@ -80,12 +79,8 @@ Results saved to `results_bsd68.json`.
 ### Experiment 6: Set12 Benchmark
 In MATLAB:
 ```matlab
-cd SURE_SVD/exp5_benchmark
+cd SURE_SVD/exp6_benchmark
 run_set12_benchmark   % Runs K-SVD, LPG-PCA, Energy matching, SURE on Set12
-```
-Then in Python (runs BM3D and merges all results into results_set12.json):
-```bash
-python SURE_SVD/exp5_benchmark/run_bm3d.py
 ```
 
 ## Reproducibility
