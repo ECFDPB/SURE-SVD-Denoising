@@ -25,16 +25,15 @@ figures/
 *.pdf
 .Rhistory
 SURE_SVD/exp4_pipeline/fig_pipeline.py
-SURE_SVD/exp5_benchmark/generate_final_table.py
-SURE_SVD/exp5_benchmark/save_visual_house.m
-SURE_SVD/exp5_benchmark/table_final_comparison.txt
-SURE_SVD/exp5_benchmark/noisy_images/
+SURE_SVD/exp6_benchmark/generate_final_table.py
+SURE_SVD/exp6_benchmark/save_visual_house.m
+SURE_SVD/exp6_benchmark/table_final_comparison.txt
+SURE_SVD/exp6_benchmark/noisy_images/
 
 # Old separate scripts (replaced by unified versions)
-SURE_SVD/exp5_benchmark/run_all_remaining.m
-SURE_SVD/exp5_benchmark/run_em_ssim.m
-SURE_SVD/exp5_benchmark/run_bm3d_em_ssim.py
-SURE_SVD/exp5_benchmark/results_all_matlab.mat
-SURE_SVD/exp5_benchmark/results_em_full.mat
-SURE_SVD/exp5_benchmark/bm3d_final.json
-SURE_SVD/exp6_bsd68/analyze_bsd68.py
+SURE_SVD/exp5_bsd68/analyze_bsd68.py
+SURE_SVD/exp6_benchmark/run_all_remaining.m
+SURE_SVD/exp6_benchmark/run_em_ssim.m
+SURE_SVD/exp6_benchmark/results_all_matlab.mat
+SURE_SVD/exp6_benchmark/results_em_full.mat
+SURE_SVD/exp6_benchmark/bm3d_final.json
