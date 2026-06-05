@@ -20,12 +20,12 @@ Code repository for the paper:
 │   ├── exp4_pipeline/          # Experiment 4: Complete denoising pipeline
 │   │   ├── sure_svd_denoising.m           # Proposed SURE-SVD method
 │   │   └── energy_matching_svd_denoising.m # Energy matching baseline (same pipeline)
-│   ├── exp5_benchmark/         # Experiment 5: Set12 benchmark comparison
-│   │   ├── run_set12_benchmark.m          # Run K-SVD/LPG-PCA/EM/SURE (MATLAB)
-│   │   └── results_set12.json            # Raw results (12 images × 3 sigmas × 4 methods)
-│   └── exp6_bsd68/             # Experiment 6: BSD68 statistical comparison
-│       ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
-│       └── results_bsd68.json            # Raw results (68 images × 3 sigmas)
+│   ├── exp5_bsd68/             # Experiment 5: BSD68 statistical comparison
+│   │   ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
+│   │   └── results_bsd68.json            # Raw results (68 images × 3 sigmas)
+│   └── exp6_benchmark/         # Experiment 6: Set12 benchmark comparison
+│       ├── run_set12_benchmark.m          # Run K-SVD/LPG-PCA/EM/SURE (MATLAB)
+│       └── results_set12.json            # Raw results (12 images × 3 sigmas × 4 methods)
 ├── ksvdbox13/                  # K-SVD official toolbox (Ron Rubinstein)
 ├── ompbox10/                   # OMP official toolbox (Ron Rubinstein)
 └── Program_lpgpca/             # LPG-PCA official code (Zhang et al.)
@@ -69,7 +69,15 @@ addpath('SURE_SVD/exp4_pipeline');
 [denoised, psnr, ssim] = sure_svd_denoising(noisy, sigma, clean);
 ```
 
-### Experiment 5: Set12 Benchmark
+### Experiment 5: BSD68 Statistical Comparison
+In MATLAB:
+```matlab
+cd SURE_SVD/exp6_bsd68
+run_bsd68_experiment   % 68 images × 3 noise levels = 204 paired trials
+```
+Results saved to `results_bsd68.json`.
+
+### Experiment 6: Set12 Benchmark
 In MATLAB:
 ```matlab
 cd SURE_SVD/exp5_benchmark
@@ -79,14 +87,6 @@ Then in Python (runs BM3D and merges all results into results_set12.json):
 ```bash
 python SURE_SVD/exp5_benchmark/run_bm3d.py
 ```
-
-### Experiment 6: BSD68 Statistical Comparison
-In MATLAB:
-```matlab
-cd SURE_SVD/exp6_bsd68
-run_bsd68_experiment   % 68 images × 3 noise levels = 204 paired trials
-```
-Results saved to `results_bsd68.json`.
 
 ## Reproducibility
 
@@ -108,4 +108,3 @@ Pre-computed results are provided in `results_set12.json` (Set12, 5 methods) and
   author={Yang, Guanzhong},
   year={2026}
 }
-```
