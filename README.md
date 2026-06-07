@@ -6,8 +6,6 @@ Code repository for the paper:
 ## Repository Structure
 
 ```
-├── set12/                      # Set12 standard grayscale test images (01–12.png)
-├── BSD68/                      # BSD68 grayscale test images (0000–0067.png)
 ├── SURE_SVD/                   # All experiment code
 │   ├── utils/                  # Shared utilities
 │   │   └── patch_utils.py     # Patch extraction, NCC search, collection builder
