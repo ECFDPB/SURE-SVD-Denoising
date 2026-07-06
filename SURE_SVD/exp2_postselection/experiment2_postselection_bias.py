@@ -86,14 +86,9 @@ def run_experiment2(collection, tau, N_MC, seed=2024):
     all_results = []
     for entry in collection:
         res_query = run_one_patch(entry['X'], tau, N_MC, rng)
-        n_alt = min(5, len(entry['similar']))
-        alt_results = []
-        for i in range(n_alt):
-            alt_results.append(run_one_patch(entry['similar'][i], tau, N_MC // 2, rng))
         all_results.append({
             'image': entry['image'], 'pos': entry['query_pos'],
-            'ncc_scores': entry['ncc_scores'][:n_alt],
-            'query_res': res_query, 'alt_res': alt_results,
+            'query_res': res_query,
         })
     return all_results
 

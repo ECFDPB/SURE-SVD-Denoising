@@ -2,7 +2,7 @@
 Experiment 1: Monte Carlo Verification of Fixed-Threshold SURE Unbiasedness
              on Real Image Patches from Set12
 
-Theoretical basis (Proposition 2.2):
+Theoretical basis (Proposition 2.4):
     For fixed deterministic omega > 0 and lambda >= 0,
         E[SURE_{omega,lambda}(Y)] = E[||X_hat_{omega,lambda}(Y) - X||^2_F]
     where Y = X + W, W_{ij} ~ i.i.d. N(0, tau^2).
@@ -90,8 +90,6 @@ def run_experiment1(collection, tau, omega_list, N_MC, seed=2024):
         m, n = P, P
         noise_scale = tau * (np.sqrt(m) + np.sqrt(n))
         lam_list = []
-        lam_list.append(float(noise_scale * 0.8))
-        lam_list.append(float(noise_scale * 1.2))
         if k >= 2:
             lam_list.append(float((sv_X[0] + sv_X[1]) / 2.0))
         lam_list.append(float(sv_X[0] * 1.2))

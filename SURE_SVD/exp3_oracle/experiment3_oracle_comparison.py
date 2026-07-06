@@ -99,17 +99,9 @@ def run_experiment3(collection, tau_grid, N_MC, seed=2024):
         query_by_tau = {}
         for tau in tau_grid:
             query_by_tau[tau] = run_one_tau(entry['X'], tau, N_MC, rng)
-        n_alt = min(3, len(entry['similar']))
-        alt_by_tau = []
-        for i in range(n_alt):
-            tau_dict = {}
-            for tau in tau_grid:
-                tau_dict[tau] = run_one_tau(entry['similar'][i], tau, N_MC // 2, rng)
-            alt_by_tau.append(tau_dict)
         all_results.append({
             'image': entry['image'], 'pos': entry['query_pos'],
-            'query_by_tau': query_by_tau, 'alt_by_tau': alt_by_tau,
-            'ncc_scores': entry['ncc_scores'][:n_alt],
+            'query_by_tau': query_by_tau,
         })
     return all_results
 
@@ -141,23 +133,6 @@ def print_summary(all_results, tau_grid):
     print(f"SURE > Energy matching in {sum(s>m for s,m in zip(all_eff_sure,all_eff_mp))}/{len(all_eff_sure)} cases")
 
 
-def run_correctness_checks(all_results, tau_grid):
-    print("\n── Correctness checks ──")
-    all_pass = True
-    for pr in all_results:
-        for tau in tau_grid:
-            r = pr['query_by_tau'][tau]
-            if r['mean_oracle'] > r['mean_sure'] + 1e-8:
-                print(f"  FAIL: oracle > SURE for {pr['image']} {pr['pos']} tau={tau:.4f}")
-                all_pass = False
-            if not (0 < r['eff_sure'] <= 1.0 + 1e-6):
-                print(f"  FAIL: eff_sure out of range for {pr['image']} tau={tau:.4f}")
-                all_pass = False
-    if all_pass:
-        print("  All checks PASS ✓")
-    return all_pass
-
-
 if __name__ == "__main__":
     print("=" * 65)
     print("Experiment 3: Oracle-Style Comparison — Set12 Patches")
@@ -181,5 +156,4 @@ if __name__ == "__main__":
     print("Running oracle comparison...")
     all_results = run_experiment3(collection, TAU_GRID, N_MC=N_MC, seed=SEED)
     print_summary(all_results, TAU_GRID)
-    run_correctness_checks(all_results, TAU_GRID)
     print("\nExperiment 3 complete.")

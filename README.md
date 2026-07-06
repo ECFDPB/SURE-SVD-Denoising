@@ -16,8 +16,7 @@ Code repository for the paper:
 │   ├── exp3_oracle/            # Experiment 3: Oracle-style comparison
 │   │   └── experiment3_oracle_comparison.py
 │   ├── exp4_pipeline/          # Experiment 4: Complete denoising pipeline
-│   │   ├── sure_svd_denoising.m           # Proposed SURE-SVD method
-│   │   └── energy_matching_svd_denoising.m # Energy matching baseline (same pipeline)
+│   │   └── sure_svd_denoising.m           # Proposed SURE-SVD method
 │   ├── exp5_bsd68/             # Experiment 5: BSD68 statistical comparison
 │   │   ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
 │   │   └── results_bsd68.json            # Raw results (68 images × 3 sigmas)
@@ -63,7 +62,7 @@ Compares SURE vs energy matching vs oracle across noise levels.
 In MATLAB:
 ```matlab
 addpath('SURE_SVD/exp4_pipeline');
-[denoised, psnr, ssim] = sure_svd_denoising(noisy, sigma, clean);
+[denoised, psnr_val, ssim_val] = sure_svd_denoising(noisy, sigma, clean);
 ```
 
 ### Experiment 5: BSD68 Statistical Comparison
@@ -91,7 +90,7 @@ noisy = clean + sigma * randn(H, W);
 
 Noise levels: σ ∈ {10, 30, 50}.
 
-Pre-computed results are provided in `results_set12.json` (Set12, 5 methods) and `results_bsd68.json` (BSD68, Energy matching vs SURE).
+Pre-computed results are provided in `results_set12.json` (Set12, 4 methods) and `results_bsd68.json` (BSD68, Energy matching vs SURE).
 
 ## Citation
 
@@ -101,3 +100,4 @@ Pre-computed results are provided in `results_set12.json` (Set12, 5 methods) and
   author={Yang, Guanzhong},
   year={2026}
 }
+```
