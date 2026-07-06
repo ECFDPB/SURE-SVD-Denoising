@@ -16,13 +16,13 @@ Code repository for the paper:
 │   ├── exp3_oracle/            # Experiment 3: Oracle-style comparison
 │   │   └── experiment3_oracle_comparison.py
 │   ├── exp4_pipeline/          # Experiment 4: Complete denoising pipeline
-│   │   └── sure_svd_denoising.m           # Proposed SURE-SVD method
+│   │   └── sure_svd_denoising.m           # Proposed SURE-SVD method (Same pipeline with Energy Matching method)
 │   ├── exp5_bsd68/             # Experiment 5: BSD68 statistical comparison
 │   │   ├── run_bsd68_experiment.m         # Run Energy matching vs SURE on BSD68
 │   │   └── results_bsd68.json            # Raw results (68 images × 3 sigmas)
 │   └── exp6_benchmark/         # Experiment 6: Set12 benchmark comparison
 │       ├── run_set12_benchmark.m          # Run K-SVD/LPG-PCA/EM/SURE (MATLAB)
-│       └── results_set12.json            # Raw results (12 images × 3 sigmas × 4 methods)
+│       └── results_set12.json            # Raw results (12 images × 3 sigmas × 5 methods)
 ├── ksvdbox13/                  # K-SVD official toolbox (Ron Rubinstein)
 ├── ompbox10/                   # OMP official toolbox (Ron Rubinstein)
 └── Program_lpgpca/             # LPG-PCA official code (Zhang et al.)
