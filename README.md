@@ -25,9 +25,11 @@ Code repository for the paper:
 │   │   ├── run_set12_benchmark.m          # Run K-SVD/LPG-PCA/EM/SURE (MATLAB)
 │   │   └── results_set12.json            # Raw results (12 images × 3 sigmas × 5 methods)
 │   ├── exp7_smooth_denoising/  # Finite-omega denoising requested in review
-│   │   └── run_smooth_denoising_experiment.m
+│   │   ├── run_smooth_denoising_experiment.m
+│   │   └── results/                       # Detailed and summary CSV results
 │   └── exp8_noise_sensitivity/ # Sensitivity to noise-level misspecification
-│       └── run_noise_level_sensitivity.m
+│       ├── run_noise_level_sensitivity.m
+│       └── results/                       # Detailed and summary CSV results
 ├── ksvdbox13/                  # K-SVD official toolbox (Ron Rubinstein)
 ├── ompbox10/                   # OMP official toolbox (Ron Rubinstein)
 └── Program_lpgpca/             # LPG-PCA official code (Zhang et al.)
@@ -94,7 +96,8 @@ run_smooth_denoising_experiment
 This experiment compares finite-omega smooth reconstruction with the hard-limit
 output on identical noisy observations. It evaluates normalized values
 `omega = {1, 5, 20, 100, 1000}` at noise levels `sigma = {10, 30, 50}` and
-writes the raw results, summary, and figure to `results/`.
+writes the raw results, summary, and figure to `results/`. The repository
+includes the completed 216-row detailed CSV and its 18-row summary CSV.
 
 ### Experiment 8: Noise-Level Sensitivity
 In MATLAB:
@@ -105,24 +108,29 @@ run_noise_level_sensitivity
 This experiment holds each noisy observation fixed while the denoiser receives
 `sigma_est/sigma_true = {0.8, 0.9, 1.0, 1.1, 1.2}`. The default configuration
 uses three independent noise realizations for every Set12 image and true noise
-level and writes paired results, summaries, and figures to `results/`.
+level and writes paired results, summaries, and figures to `results/`. The
+repository includes the completed 540-row detailed CSV and its 15-row summary
+CSV.
 
 Experiments 7–8 expect local Set12 inputs under
 `SURE_SVD/exp6_benchmark/noisy_images/`. Files are named
 `01_sigma10.mat`, ..., `12_sigma50.mat` and contain `clean` and `noisy`
 arrays. This generated-data directory is intentionally excluded from Git.
 
-## Minimal Reviewer-Requested Addition
+## Reviewer-Requested Addition
 
-The reviewer-requested experiments are provided with only four MATLAB files:
+The executable implementation is kept to four MATLAB source files:
 
 1. `SURE_SVD/exp4_pipeline/sure_svd_denoising.m`
 2. `SURE_SVD/exp4_pipeline/smooth_svd_denoising.m`
 3. `SURE_SVD/exp7_smooth_denoising/run_smooth_denoising_experiment.m`
 4. `SURE_SVD/exp8_noise_sensitivity/run_noise_level_sensitivity.m`
 
-Shard runners, monitoring scripts, smoke tests, generated figures, and result
-files are not part of this minimal addition.
+Four pre-computed CSV outputs are also included: detailed and summary results
+for Experiments 7 and 8. CSV is the native output format of these MATLAB
+runners; no separate JSON conversion is required. Shard runners, monitoring
+scripts, smoke-test wrappers, generated figures, and the large generated
+Set12 `.mat` inputs are not part of this minimal addition.
 
 ## Reproducibility
 
@@ -134,7 +142,10 @@ noisy = clean + sigma * randn(H, W);
 
 Noise levels: σ ∈ {10, 30, 50}.
 
-Pre-computed results are provided in `results_set12.json` (Set12, 4 methods) and `results_bsd68.json` (BSD68, Energy matching vs SURE).
+Pre-computed results are provided in `results_set12.json` (Set12, 4 methods),
+`results_bsd68.json` (BSD68, Energy matching vs SURE), and the detailed plus
+summary CSV files under the Experiment 7 and Experiment 8 `results/`
+directories.
 
 ## Citation
 
