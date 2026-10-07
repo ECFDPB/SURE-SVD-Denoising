@@ -27,7 +27,7 @@ Code repository for the paper:
 │   ├── exp7_smooth_denoising/  # Finite-omega denoising requested in review
 │   │   ├── run_smooth_denoising_experiment.m
 │   │   └── results/                       # Detailed and summary CSV results
-│   └── exp8_noise_sensitivity/ # Sensitivity to noise-level misspecification
+│   └── exp8_noise_sensitivity/ # Noise-level sensitivity requested in review
 │       ├── run_noise_level_sensitivity.m
 │       └── results/                       # Detailed and summary CSV results
 ├── ksvdbox13/                  # K-SVD official toolbox (Ron Rubinstein)
