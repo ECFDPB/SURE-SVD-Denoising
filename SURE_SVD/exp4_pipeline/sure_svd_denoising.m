@@ -177,11 +177,20 @@ end
 function s = compute_ssim(img1, img2)
     C1 = (0.01*255)^2; C2 = (0.03*255)^2;
     img1 = double(img1); img2 = double(img2);
-    win = fspecial('gaussian', 11, 1.5);
+    win = gaussian_window(11, 1.5);
     mu1 = conv2(img1, win, 'same'); mu2 = conv2(img2, win, 'same');
     s1 = conv2(img1.^2, win, 'same') - mu1.^2;
     s2 = conv2(img2.^2, win, 'same') - mu2.^2;
     s12 = conv2(img1.*img2, win, 'same') - mu1.*mu2;
     ssim_map = ((2*mu1.*mu2+C1).*(2*s12+C2))./((mu1.^2+mu2.^2+C1).*(s1+s2+C2));
     s = mean(ssim_map(:));
+end
+
+function window = gaussian_window(window_size, standard_deviation)
+    radius = (window_size - 1) / 2;
+    coordinates = -radius:radius;
+    [x_grid, y_grid] = meshgrid(coordinates, coordinates);
+    window = exp(-(x_grid.^2 + y_grid.^2) / ...
+                 (2 * standard_deviation^2));
+    window = window / sum(window(:));
 end
